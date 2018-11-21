@@ -1,0 +1,25 @@
+[package]
+name = "simple-http"
+version = "0.1.0"
+authors = ["Andrey Tkachenko <andreytkachenko64@gmail.com>"]
+edition = "2018"
+
+[dependencies]
+tokio = {version = "0.1", features = ["async-await-preview"]}
+futures-preview = {version = "0.3.0-alpha.9", features = ["tokio-compat"]}
+bytes = "0.4"
+hyper = "0.12"
+hyper-tls = "0.3"
+native-tls = "0.2.2"
+tokio-tls = "0.2.0"
+tokio-io = "0.1.10"
+http = "0.1.13"
+typed-headers = "0.1.0"
+futures-legacy = {version = "0.1.25", package = "futures"}
+tokio-core = "0.1.17"
+tokio-tcp = "0.1.2"
+tokio-timer = "0.2.7"
+tokio-reactor = "0.1.6"
+net2 = "0.2.33"
+tokio-threadpool = "0.1.8"
+futures-cpupool = "0.1.8"
