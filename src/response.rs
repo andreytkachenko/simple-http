@@ -79,7 +79,7 @@ impl Stream for Body {
         if let Some(vec) = this.rest.take() {
             Poll::Ready(Some(Ok(vec)))
         } else {
-            match this.reader.poll_read(&mut this.buf[..]) {
+            match this.reader.poll_read(&mut this.buf[0 ..]) {
                 Ok(Async::NotReady) => Poll::Pending,
                 Ok(Async::Ready(mut n)) => {
                     this.counter += n;
@@ -91,9 +91,8 @@ impl Stream for Body {
                     }
 
                     if n > 0 {
-                        Poll::Ready(Some(Ok(this.buf[0..n].to_vec())))
+                        Poll::Ready(Some(Ok(this.buf[0 .. n].to_vec())))
                     } else {
-
                         Poll::Ready(None)
                     }
                 },

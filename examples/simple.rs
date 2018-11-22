@@ -8,7 +8,7 @@ fn main() {
         let connector = HttpsConnector::new(4).unwrap();
         let client = Client::new(connector);
 
-        let url = "https://www.rust-lang.org/ru-RU/contribute.html".parse().unwrap();
+        let url = "https://www.vrbo.com/781849".parse().unwrap();
         let req: Request<futures::stream::Empty<_>>= Request::new(Method::Get, url);
 
 
@@ -23,6 +23,6 @@ fn main() {
             b.extend_from_slice(&(chunk.unwrap())[..]);
         }
 
-        println!("{}", String::from_utf8_lossy(&b[..]))
+//        println!("{}", String::from_utf8_lossy(&b[..]))
     });
 }

@@ -129,7 +129,7 @@ impl<C> Client<C>
 
     fn build_req(&self, method: Method, url: Uri, headers: Vec<(String, String)>) -> String {
         let req = url.path_and_query().map(|v|v.as_str()).unwrap_or("/");
-        let mut header = format!("{} {} HTTP/1.1\r\n", method.as_str(), req);
+        let mut header = format!("{} {} HTTP/1.0\r\n", method.as_str(), req);
 
         header.push_str("Host: ");
         header.push_str(&url.host().unwrap().to_string());
