@@ -8,6 +8,8 @@ mod response;
 mod httparse;
 mod utils;
 mod connect;
+mod body;
+
 
 use tokio::await;
 use native_tls::TlsConnector as NativeTlsConnector;
@@ -16,7 +18,8 @@ use std::{io, mem};
 use std::pin::Pin;
 use futures::stream::{Stream, StreamExt};
 use futures::future::Future;
-pub use self::response::{Response, Body};
+pub use self::response::Response;
+pub use self::body::Body;
 pub use self::request::Request;
 use self::httparse::{parse_headers, Header};
 use std::net::ToSocketAddrs;
@@ -25,30 +28,8 @@ pub use hyper::Uri;
 use self::connect::{Connect, Connected, Destination};
 pub use self::https::HttpsConnector;
 pub use self::connect::HttpConnector;
-
-pub enum Method {
-    Get,
-    Head,
-    Post,
-    Put,
-    Patch,
-    Delete,
-    Options,
-}
-
-impl Method {
-    pub fn as_str(&self) -> &str {
-        match self {
-            Method::Get => "GET",
-            Method::Head => "HEAD",
-            Method::Post => "POST",
-            Method::Put => "PUT",
-            Method::Patch => "PATCH",
-            Method::Delete => "DELETE",
-            Method::Options => "OPTIONS",
-        }
-    }
-}
+pub use ::http::Method;
+use std::marker::PhantomData;
 
 pub struct Client<C>
     where C: Connect<Error=io::Error>,
@@ -61,6 +42,12 @@ impl<C> Client<C>
 {
     pub fn new(inner: C) -> Self {
         Self { inner }
+    }
+
+    pub fn builder() -> ClientBuilder<C> {
+        ClientBuilder {
+            m: Default::default()
+        }
     }
 
     pub async fn request<'a, B>(&'a self, mut req: Request<B>) -> io::Result<Response<Body>>
@@ -124,7 +111,7 @@ impl<C> Client<C>
 
         let content_length = header.2.iter().find_map(|(k, v)| if k == "content-length" { v.parse::<usize>().ok() } else { None });
 
-        Ok(Response::new(header.0, header.1, header.2, Body::new(conn, Some(rest.to_vec()), content_length)))
+        Ok(Response::new(header.0, header.2, Body::new(conn, Some(rest.to_vec()), content_length)))
     }
 
     fn build_req(&self, method: Method, url: Uri, headers: Vec<(String, String)>) -> String {
@@ -150,5 +137,19 @@ impl<C> Client<C>
         header.push_str("\r\n");
 
         header
+    }
+}
+
+pub struct ClientBuilder<C>
+    where C: Connect<Error=io::Error>,
+{
+    m: PhantomData<fn(C)>
+}
+
+impl<C> ClientBuilder<C>
+    where C: Connect<Error=io::Error>,
+{
+    pub fn build(self, connector: C) -> Client<C> {
+        Client::new(connector)
     }
 }

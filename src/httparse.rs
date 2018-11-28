@@ -73,7 +73,7 @@ fn parse_status(input: &[u8]) -> Result<(u16, &[u8], &[u8]), ParseError> {
          (*code.get_unchecked(2) as i16 - b'0' as i16))
     };
 
-    if  a < 0 || a > 9 ||
+    if  a < 1 || a > 5 ||
         b < 0 || b > 9 ||
         c < 0 || c > 9 {
 

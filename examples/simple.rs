@@ -23,6 +23,6 @@ fn main() {
             b.extend_from_slice(&(chunk.unwrap())[..]);
         }
 
-//        println!("{}", String::from_utf8_lossy(&b[..]))
+        println!("{:?}", String::from_utf8_lossy(&b[..]))
     });
 }
