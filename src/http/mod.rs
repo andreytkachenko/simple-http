@@ -1,4 +1,4 @@
-mod dns;
+pub mod dns;
 
 use std::borrow::Cow;
 use std::fmt;

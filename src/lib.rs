@@ -1,7 +1,7 @@
 #![feature(await_macro, async_await, futures_api, pin, arbitrary_self_types)]
 
-mod http;
-mod https;
+pub mod http;
+pub mod https;
 pub mod proxy;
 mod request;
 mod response;
