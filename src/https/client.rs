@@ -43,6 +43,35 @@ impl HttpsConnector<HttpConnector> {
     }
 }
 
+impl<R> HttpsConnector<HttpConnector<R>> {
+    /// Construct a new HttpsConnector.
+    ///
+    /// Takes number of DNS worker threads.
+    ///
+    /// This uses hyper's default `HttpConnector`, and default `TlsConnector`.
+    /// If you wish to use something besides the defaults, use `From::from`.
+    ///
+    /// # Note
+    ///
+    /// By default this connector will use plain HTTP if the URL provded uses
+    /// the HTTP scheme (eg: http://example.com/).
+    ///
+    /// If you would like to force the use of HTTPS then call https_only(true)
+    /// on the returned connector.
+    pub fn new_with_resolver(resolver: R) -> Result<Self, Error> {
+        TlsConnector::builder()
+            .build()
+            .map(|tls| HttpsConnector::new_with_resolver_(resolver, tls))
+    }
+
+    fn new_with_resolver_(resolver: R, tls: TlsConnector) -> Self {
+        let mut http = HttpConnector::new_with_resolver(resolver);
+
+        http.enforce_http(false);
+        HttpsConnector::from((http, tls))
+    }
+}
+
 impl<T> HttpsConnector<T> {
     /// Force the use of HTTPS when connecting.
     ///
