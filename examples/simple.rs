@@ -1,4 +1,4 @@
-#![feature(await_macro, async_await, futures_api, pin, arbitrary_self_types)]
+#![feature(await_macro, async_await, futures_api, arbitrary_self_types)]
 
 use simple_http::{Request, Method, Client, HttpsConnector};
 use futures::stream::StreamExt;
@@ -9,12 +9,12 @@ fn main() {
         let client = Client::new(connector);
 
         let url = "https://www.vrbo.com/781849".parse().unwrap();
-        let req: Request<futures::stream::Empty<_>>= Request::new(Method::Get, url);
+        let req: Request<futures::stream::Empty<_>>= Request::new(Method::GET, url);
 
 
         let res = await!(client.request(req)).unwrap();
 
-        println!("code {}", res.code());
+        println!("code {}", res.status());
 
         let mut body = res.into_body();
         let mut b = Vec::new();

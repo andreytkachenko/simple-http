@@ -1,4 +1,5 @@
 pub mod dns;
+pub mod ares;
 
 use std::borrow::Cow;
 use std::fmt;
@@ -18,10 +19,11 @@ use tokio_timer::Delay;
 
 use crate::connect::{Connect, Connected, Destination};
 use self::dns::{GaiResolver, Resolve, TokioThreadpoolGaiResolver};
-
+use self::ares::CAresResolverImpl;
+use std::sync::Arc;
 
 #[derive(Clone)]
-pub struct HttpConnector<R = GaiResolver> {
+pub struct HttpConnector<R = Arc<CAresResolverImpl>> {
     enforce_http: bool,
     handle: Option<Handle>,
     happy_eyeballs_timeout: Option<Duration>,
@@ -38,7 +40,7 @@ impl HttpConnector {
     /// Takes number of DNS worker threads.
     #[inline]
     pub fn new(threads: usize) -> HttpConnector {
-        HttpConnector::new_with_resolver(GaiResolver::new(threads))
+        HttpConnector::new_with_resolver(Arc::new(CAresResolverImpl::new()))
     }
 }
 
