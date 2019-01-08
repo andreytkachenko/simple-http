@@ -10,22 +10,17 @@ mod utils;
 mod connect;
 mod body;
 
-
 use tokio::await;
-use native_tls::TlsConnector as NativeTlsConnector;
-use tokio::net::TcpStream;
 use std::{io, mem};
 use std::pin::Pin;
 use futures::stream::{Stream, StreamExt};
-use futures::future::Future;
 pub use self::response::Response;
 pub use self::body::Body;
 pub use self::request::Request;
 use self::httparse::{parse_headers, Header};
-use std::net::ToSocketAddrs;
 
 pub use hyper::Uri;
-use self::connect::{Connect, Connected, Destination};
+use self::connect::{Connect, Destination};
 pub use self::https::HttpsConnector;
 pub use self::connect::HttpConnector;
 pub use ::http::Method;
@@ -53,7 +48,7 @@ impl<C> Client<C>
     pub async fn request<'a, B>(&'a self, mut req: Request<B>) -> io::Result<Response<Body>>
         where B: Stream<Item = io::Result<Vec<u8>>> + Send + 'a
     {
-        let (conn, cnt)= await!(self.inner.connect(Destination {
+        let (conn, _)= await!(self.inner.connect(Destination {
             uri: req.uri.clone()
         }))?;
 

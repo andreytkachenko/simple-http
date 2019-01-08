@@ -24,6 +24,16 @@ pub trait Resolve {
     fn resolve(&self, name: Name) -> Self::Future;
 }
 
+impl<T: Resolve> Resolve for Arc<T> {
+    type Addrs = T::Addrs;
+    type Future = T::Future;
+
+    #[inline]
+    fn resolve(&self, name: Name) -> Self::Future {
+        (**self).resolve(name)
+    }
+}
+
 /// A domain name to resolve into IP addresses.
 pub struct Name {
     host: String,
