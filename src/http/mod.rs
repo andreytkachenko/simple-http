@@ -10,7 +10,6 @@ use std::net::{IpAddr, SocketAddr};
 use std::time::{Duration, Instant};
 
 use futures_legacy::{try_ready, Async, Future, Poll};
-use futures_legacy::future::{Executor};
 use http::uri::Scheme;
 use net2::TcpBuilder;
 use tokio_reactor::Handle;
@@ -18,9 +17,14 @@ use tokio_tcp::{TcpStream, ConnectFuture};
 use tokio_timer::Delay;
 
 use crate::connect::{Connect, Connected, Destination};
-use self::dns::{GaiResolver, Resolve, TokioThreadpoolGaiResolver};
+use self::dns::{GaiResolver, Resolve};
 use self::ares::CAresResolverImpl;
 use std::sync::Arc;
+use lazy_static::lazy_static;
+
+lazy_static! {
+    static ref ARES: Arc<CAresResolverImpl> = Arc::new(CAresResolverImpl::new());
+}
 
 #[derive(Clone)]
 pub struct HttpConnector<R = Arc<CAresResolverImpl>> {
@@ -40,7 +44,7 @@ impl HttpConnector {
     /// Takes number of DNS worker threads.
     #[inline]
     pub fn new(threads: usize) -> HttpConnector {
-        HttpConnector::new_with_resolver(Arc::new(CAresResolverImpl::new()))
+        HttpConnector::new_with_resolver(ARES.clone())
     }
 }
 
