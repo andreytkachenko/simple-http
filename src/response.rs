@@ -1,7 +1,7 @@
 use futures::stream::Stream;
 use std::io;
 use std::pin::Pin;
-use std::task::{Poll, LocalWaker};
+use std::task::Poll;
 use tokio::prelude::Async;
 use crate::body::Body;
 use ::http::StatusCode;
