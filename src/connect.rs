@@ -62,7 +62,7 @@ impl Destination {
     /// Get the port, if specified.
     #[inline]
     pub fn port(&self) -> Option<u16> {
-        self.uri.port()
+        self.uri.port_u16()
     }
 
     /// Update the scheme of this destination.
@@ -123,7 +123,7 @@ impl Destination {
                 .map_err(|_| Error::Parse)?
         } else {
             let auth = host.parse::<uri::Authority>().map_err(|_| Error::Parse)?;
-            if auth.port().is_some() {
+            if auth.port_u16().is_some() {
                 return Err(Error::Parse);
             }
             auth
@@ -203,7 +203,7 @@ impl Destination {
                 self.uri = uri;
                 Ok(())
             },
-            Err(err) => {
+            Err(_err) => {
                 self.uri = old_uri;
                 Err(Error::Parse)
             },

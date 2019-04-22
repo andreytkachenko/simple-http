@@ -1,4 +1,4 @@
-#![feature(await_macro, async_await, futures_api, pin, arbitrary_self_types)]
+#![feature(await_macro, async_await, futures_api)]
 
 pub mod http;
 pub mod https;

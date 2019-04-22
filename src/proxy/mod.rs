@@ -47,7 +47,7 @@ impl Dst for Uri {
         self.host()
     }
     fn port(&self) -> Option<u16> {
-        self.port()
+        self.port_u16()
     }
 }
 
@@ -343,7 +343,7 @@ fn proxy_dst(dst: &Destination, proxy: &Uri) -> io::Result<Destination> {
         .host()
         .map(|h| dst.set_host(h).map_err(io_err))
         .unwrap_or_else(|| Err(io_err(format!("proxy uri missing host: {}", proxy))))?;
-    dst.set_port(proxy.port());
+    dst.set_port(proxy.port_u16());
 
     Ok(dst)
 }

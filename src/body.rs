@@ -1,6 +1,6 @@
 use futures::stream::Stream;
 use tokio::prelude::Async;
-use std::task::{Poll, Waker};
+use std::task::{Poll, Context};
 use std::pin::Pin;
 use std::io;
 
@@ -45,7 +45,7 @@ impl Body {
 impl Stream for Body {
     type Item = io::Result<Vec<u8>>;
 
-    fn poll_next(mut self: Pin<&mut Self>, _waker: &Waker) -> Poll<Option<Self::Item>> {
+    fn poll_next(mut self: Pin<&mut Self>, _: &mut Context) -> Poll<Option<Self::Item>> {
         let this = &mut *self;
 
         if this.drained {

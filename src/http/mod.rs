@@ -43,7 +43,7 @@ impl HttpConnector {
     ///
     /// Takes number of DNS worker threads.
     #[inline]
-    pub fn new(threads: usize) -> HttpConnector {
+    pub fn new(_threads: usize) -> HttpConnector {
         HttpConnector::new_with_resolver(ARES.clone())
     }
 }
@@ -94,7 +94,7 @@ impl<R> Connect for HttpConnector<R>
             Some(s) => s,
             None => return invalid_url(InvalidUrl::MissingAuthority, &self.handle),
         };
-        let port = match dst.uri.port() {
+        let port = match dst.uri.port_u16() {
             Some(port) => port,
             None => if dst.uri.scheme_part() == Some(&Scheme::HTTPS) { 443 } else { 80 },
         };
@@ -366,7 +366,7 @@ fn connect(addr: &SocketAddr, local_addr: &Option<IpAddr>, handle: &Option<Handl
 
     let handle = match *handle {
         Some(ref handle) => Cow::Borrowed(handle),
-        None => Cow::Owned(Handle::current()),
+        None => Cow::Owned(Handle::default()),
     };
 
     Ok(TcpStream::connect_std(builder.to_tcp_stream()?, addr, &handle))
