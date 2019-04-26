@@ -1,7 +1,7 @@
 use std::fmt;
 use std::io;
 
-use tokio::prelude::{Async, Future, future, Poll};
+use futures_legacy::{Async, Future, future, Poll};
 use crate::connect::{Connect, Connected, Destination, HttpConnector};
 pub use native_tls::Error;
 use native_tls::{self, HandshakeError, TlsConnector};

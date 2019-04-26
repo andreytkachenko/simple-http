@@ -2,7 +2,7 @@ use std::fmt;
 use std::io::{self, Read, Write};
 
 use bytes::{Buf, BufMut};
-use tokio::prelude::{Async, Poll};
+use futures_legacy::{Async, Poll};
 use native_tls;
 use tokio_io::{AsyncRead, AsyncWrite};
 

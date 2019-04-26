@@ -1,8 +1,10 @@
 use futures::stream::Stream;
-use tokio::prelude::Async;
 use std::task::{Poll, Context};
 use std::pin::Pin;
 use std::io;
+use futures::io::AsyncRead;
+use futures::compat::*;
+
 
 static EMPTY: &[u8] = &[];
 
@@ -12,7 +14,7 @@ pub struct Body {
     buf: Vec<u8>,
     counter: usize,
     content_length: Option<usize>,
-    reader: Box<dyn tokio_io::AsyncRead + Send + 'static>,
+    reader: Box<dyn AsyncRead + Send + 'static>,
 }
 
 impl Body {
@@ -37,7 +39,7 @@ impl Body {
             buf,
             counter: 0,
             content_length,
-            reader: Box::new(reader)
+            reader: Box::new(reader.compat())
         }
     }
 }
@@ -45,7 +47,7 @@ impl Body {
 impl Stream for Body {
     type Item = io::Result<Vec<u8>>;
 
-    fn poll_next(mut self: Pin<&mut Self>, _: &mut Context) -> Poll<Option<Self::Item>> {
+    fn poll_next(mut self: Pin<&mut Self>, ctx: &mut Context) -> Poll<Option<Self::Item>> {
         let this = &mut *self;
 
         if this.drained {
@@ -55,9 +57,9 @@ impl Stream for Body {
         if let Some(vec) = this.rest.take() {
             Poll::Ready(Some(Ok(vec)))
         } else {
-            match this.reader.poll_read(&mut this.buf[0 ..]) {
-                Ok(Async::NotReady) => Poll::Pending,
-                Ok(Async::Ready(mut n)) => {
+            match unsafe {Pin::new_unchecked(&mut *this.reader)}.poll_read(ctx, &mut this.buf[0 ..]) {
+                Poll::Pending => Poll::Pending,
+                Poll::Ready(Ok(mut n)) => {
                     this.counter += n;
 
                     if let Some(max) = this.content_length {
@@ -72,7 +74,7 @@ impl Stream for Body {
                         Poll::Ready(None)
                     }
                 },
-                Err(err) => {
+                Poll::Ready(Err(err)) => {
                     this.drained = true;
                     Poll::Ready(Some(Err(err)))
                 }

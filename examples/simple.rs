@@ -2,9 +2,10 @@
 
 use simple_http::{Request, Method, Client, HttpsConnector};
 use futures::stream::StreamExt;
+use futures::executor;
 
 fn main() {
-    tokio::run_async(async move {
+    executor::block_on(async move {
         let connector = HttpsConnector::new(4).unwrap();
         let client = Client::new(connector);
 

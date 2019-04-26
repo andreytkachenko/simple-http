@@ -1,5 +1,5 @@
 use std::fmt;
-use crate::utils::iter_fn;
+use std::iter;
 
 fn ltrim(mut val: &[u8]) -> &[u8] {
     while let Some(&b' ') = val.get(0) {
@@ -89,7 +89,7 @@ fn parse_status(input: &[u8]) -> Result<(u16, &[u8], &[u8]), ParseError> {
 pub fn parse_headers(mut input: &[u8]) -> impl Iterator<Item = Result<Header<'_>, ParseError>> {
     let mut status_parsed = false;
 
-    iter_fn(move || {
+    iter::from_fn(move || {
         let idx = input.windows(2).position(|s| &s[0..2] == b"\r\n")?;
         let line = &input[..idx];
         input = &input[idx + 2..];
