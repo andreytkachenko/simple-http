@@ -1,4 +1,4 @@
-#![feature(await_macro, async_await, futures_api)]
+#![feature(async_await)]
 
 pub mod http;
 pub mod https;
@@ -47,21 +47,21 @@ impl<C> Client<C>
     pub async fn request<'a, B>(&'a self, mut req: Request<B>) -> io::Result<Response<Body>>
         where B: Stream<Item = io::Result<Vec<u8>>> + Send + 'a
     {
-        let (conn, _)= await!(self.inner.connect(Destination {
+        let (conn, _)= self.inner.connect(Destination {
             uri: req.uri.clone()
-        }).compat())?;
+        }).compat().await?;
 
         // sending headers
         let header = self.build_req(req.method, req.uri, req.headers);
 
-        let (mut conn, _) = await!(tokio_io::io::write_all(conn, header.as_bytes()).compat())?;
+        let (mut conn, _) = tokio_io::io::write_all(conn, header.as_bytes()).compat().await?;
 
         // sending body
         if let Some(mut body) = req.body.take() {
             let mut x = unsafe {Pin::new_unchecked(&mut body)};
 
-            while let Some(res) = await!(x.next()) {
-                let (c, _) = await!(tokio_io::io::write_all(conn, res?).compat())?;
+            while let Some(res) = x.next().await {
+                let (c, _) = tokio_io::io::write_all(conn, res?).compat().await?;
                 conn = c
             }
         }
@@ -71,7 +71,7 @@ impl<C> Client<C>
         let mut left = 0usize;
 
         let (header, rest) = loop {
-            let (tconn, _, len) = await!(tokio_io::io::read(conn, &mut buf[left ..]).compat())?;
+            let (tconn, _, len) = tokio_io::io::read(conn, &mut buf[left ..]).compat().await?;
             conn = tconn;
 
             if len == 0 {
