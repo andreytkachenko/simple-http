@@ -1,5 +1,3 @@
-#![feature(await_macro, async_await, futures_api, arbitrary_self_types)]
-
 use simple_http::{Request, Method, Client, HttpsConnector};
 use futures::stream::StreamExt;
 use futures::executor;
@@ -13,14 +11,14 @@ fn main() {
         let req: Request<futures::stream::Empty<_>>= Request::new(Method::GET, url);
 
 
-        let res = await!(client.request(req)).unwrap();
+        let res = client.request(req).await.unwrap();
 
         println!("code {}", res.status());
 
         let mut body = res.into_body();
         let mut b = Vec::new();
 
-        while let Some(chunk) = await!(body.next()) {
+        while let Some(chunk) = body.next().await {
             b.extend_from_slice(&(chunk.unwrap())[..]);
         }
 

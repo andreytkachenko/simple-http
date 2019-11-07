@@ -1,5 +1,3 @@
-#![feature(async_await)]
-
 pub mod http;
 pub mod https;
 pub mod proxy;

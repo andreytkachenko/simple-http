@@ -5,7 +5,7 @@ authors = ["Andrey Tkachenko <andreytkachenko64@gmail.com>"]
 edition = "2018"
 
 [dependencies]
-futures-preview = {version = "0.3.0-alpha.15", features=["compat", "io-compat"]}
+futures = {version = "0.3.0", features=["io-compat"]}
 bytes = "0.4"
 hyper = "0.12"
 hyper-tls = "0.3"
@@ -14,7 +14,7 @@ tokio-tls = "0.2.0"
 tokio-io = "0.1.10"
 http = "0.1.14"
 typed-headers = "0.1.0"
-futures-legacy = {version = "0.1.25", package = "futures"}
+futures-legacy = {version = "0.1", package = "futures"}
 tokio-core = "0.1.17"
 tokio-tcp = "0.1.2"
 tokio-timer = "0.2.7"
